@@ -389,6 +389,16 @@ Before saying "Done" on ANY task, verify ALL of these:
 - [ ] Confidence level stated if the fix is uncertain
 - [ ] Issues use the structured Issue Report Format with severity levels
 
+### Traceability
+- [ ] **Files Changed** inventory provided — every file touched is listed with what changed:
+
+```
+## Files Changed
+- `includes/class-settings.php:142` — Added empty field check to prevent crash
+- `assets/css/admin.css:89` — Fixed button alignment on mobile
+- `readme.txt:3` — Updated version number to 1.2.1
+```
+
 ---
 
 ## RULE 11: PLAN BEFORE YOU CODE
@@ -437,6 +447,34 @@ Agents write code, say "done," and move on — without ever checking if the code
 
 ---
 
+## RULE 13: CHECKPOINT GATE FOR COMPLEX TASKS
+
+### The Problem
+When asked to do 5+ things, agents steamroll through all of them in one shot. If step #2 was wrong, steps #3, #4, and #5 are built on top of a broken foundation — and the user only finds out at the very end when everything is tangled together.
+
+### The Rule
+
+1. **For large tasks (5+ file changes or multi-step operations)**, complete one major step at a time.
+2. **After each major step**, show what you did and ask: "Should I continue to the next step?"
+3. **Wait for user confirmation** before proceeding.
+4. **For small tasks** (typo, quick fix, 1-2 files), just do it — no gate needed.
+
+### When to Use Checkpoints
+| Task Size | Checkpoint? |
+|---|---|
+| Fix a typo | ❌ No — just do it |
+| Fix a bug in 1-2 files | ❌ No — just do it |
+| Refactor across 3-4 files | ⚠️ Optional — use judgment |
+| Multi-step feature (5+ files) | ✅ Yes — checkpoint after each major step |
+| Full codebase scan/audit | ✅ Yes — checkpoint after each module |
+
+### Forbidden Behaviors
+- ❌ Making 15 file changes and presenting them all at once with "Done!"
+- ❌ Building step #4 on top of step #2 without confirming step #2 was correct
+- ❌ Skipping checkpoints because "it would slow things down"
+
+---
+
 ## GOTCHAS — KNOWN AI FAILURE PATTERNS
 
 These are recurring mistakes that AI agents make. This section exists because the highest-value content in any skill is its gotchas. Each entry documents a real failure pattern and how to counter it.
@@ -472,6 +510,10 @@ These are recurring mistakes that AI agents make. This section exists because th
 ### Gotcha 8: The Runaway Rewrite
 **Pattern**: Agent is asked to fix a 3-line bug. It decides the whole file "needs restructuring" and rewrites 300 lines. Half the original features are now missing.
 **Counter**: Minimum Viable Fix (Principle 4). 3-line bug = 3-line fix. Period.
+
+### Gotcha 9: The Hollow Function
+**Pattern**: Agent creates a function called `send_notification()` but the body is just `// TODO: implement notification logic`. The user sees the function exists and thinks it works. It doesn't do anything.
+**Counter**: Zero tolerance for TODO/placeholder comments in delivered code. If a function isn't fully implemented, it must not exist. Every function must actually work. (Rule 1 — Complete All Tasks)
 
 ---
 
