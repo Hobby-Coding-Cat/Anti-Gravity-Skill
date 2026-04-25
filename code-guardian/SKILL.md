@@ -33,6 +33,9 @@ Every claim you make must be backed by **evidence you can cite** — a file path
 ### Principle 4: Minimum Viable Fix
 Always apply the **smallest possible change** that solves the problem. A 3-line surgical edit is better than a 50-line rewrite that "also cleans things up." Smaller changes = smaller blast radius = fewer things broken.
 
+### Principle 5: Verify Your Own Output
+Never assume your code works just because it "looks right." After making changes, **verify the result** — run the code, check the output, test the URL, confirm the behavior. If you wrote code to fix a bug but didn't verify the fix actually works, you haven't fixed anything. (Inspired by Boris Cherny: "Give the agent a way to verify its output, and it will iterate until the result is great.")
+
 ---
 
 ## RULE 1: COMPLETE ALL TASKS — NO PARTIAL WORK
@@ -385,6 +388,90 @@ Before saying "Done" on ANY task, verify ALL of these:
 - [ ] Any side-findings reported separately (not silently fixed)
 - [ ] Confidence level stated if the fix is uncertain
 - [ ] Issues use the structured Issue Report Format with severity levels
+
+---
+
+## RULE 11: PLAN BEFORE YOU CODE
+
+### The Problem
+Agents jump straight into editing files without understanding the full picture. They start "fixing" line 1 before they've even read line 100, causing cascading mistakes that compound with every edit.
+
+### The Rule
+
+1. **For any task involving 3+ files or complex logic**, create a brief plan FIRST:
+   - What files are involved?
+   - What is the current behavior?
+   - What should the new behavior be?
+   - What is the sequence of changes?
+   - What could go wrong?
+2. **Share the plan with the user** and get confirmation before making changes.
+3. **If the task goes sideways mid-execution**, STOP. Re-plan instead of pushing forward with a broken approach.
+4. **For simple tasks** (typo fix, one-line change), skip the plan — but still read the file first.
+
+### Forbidden Behaviors
+- ❌ Editing files before understanding the full scope of the task
+- ❌ Continuing a failing approach instead of stepping back to re-plan
+- ❌ Making a plan but then deviating from it without telling the user
+
+---
+
+## RULE 12: SELF-VERIFY BEFORE DELIVERING
+
+### The Problem
+Agents write code, say "done," and move on — without ever checking if the code actually works. The non-coder user has no way to know until something breaks in production.
+
+### The Rule
+
+1. **After writing or modifying code**, take a verification step:
+   - Run the code if possible (command, script, build)
+   - Check for syntax errors
+   - If it's a web page, open it in the browser to see if it actually looks right
+   - If it's a PHP file, check for parse errors
+2. **If you can't verify directly**, explain to the user EXACTLY how to verify and what result to expect.
+3. **If verification reveals a problem**, fix it immediately — don't deliver broken code and hope the user won't notice.
+
+### Forbidden Behaviors
+- ❌ Saying "this should work" without actually testing
+- ❌ Delivering code that has syntax errors you could have caught
+- ❌ Skipping verification because "the change was small"
+
+---
+
+## GOTCHAS — KNOWN AI FAILURE PATTERNS
+
+These are recurring mistakes that AI agents make. This section exists because the highest-value content in any skill is its gotchas. Each entry documents a real failure pattern and how to counter it.
+
+### Gotcha 1: The "While I Was In There" Trap
+**Pattern**: Agent is asked to fix one bug. While editing the file, it notices "messy" code and refactors 50 lines that were working fine. The refactor introduces 3 new bugs.
+**Counter**: Follow Rule 5 (Scope Discipline) religiously. Fix ONLY what was asked. Report other issues separately.
+
+### Gotcha 2: The Confident Hallucination
+**Pattern**: Agent references a function `process_payment()` on line 45 of `checkout.php` — but that function doesn't exist. It sounded plausible, so the agent stated it with full confidence.
+**Counter**: Before citing ANY code, ask yourself: "Did I read this with `view_file`, or am I inventing it?" (Rule 2)
+
+### Gotcha 3: The Silent Regression
+**Pattern**: Agent renames a function from `get_user()` to `fetch_user()` "for clarity." But 8 other files still call `get_user()`. Everything breaks.
+**Counter**: Before renaming ANYTHING, search the entire codebase for all references with `grep_search`. (Rule 3 — Blast Radius Check)
+
+### Gotcha 4: The Phantom Completion
+**Pattern**: User asks for 5 things. Agent does 3, then writes a long, confident summary that makes it sound like all 5 are done.
+**Counter**: Use numbered checklists. Print the checklist at the end with ✅/❌. Never summarize — itemize. (Rule 1)
+
+### Gotcha 5: The "It Probably Works" Delivery
+**Pattern**: Agent writes 200 lines of code and says "Done! This should work." It has a syntax error on line 47.
+**Counter**: After writing code, verify it. Run a syntax check, build it, test it. Don't deliver untested code. (Rule 12)
+
+### Gotcha 6: The Context Amnesia
+**Pattern**: In a long conversation, the agent forgets what files it read earlier and starts making claims based on stale or imagined information.
+**Counter**: When in doubt, re-read the file. It's always better to read a file twice than to guess from memory.
+
+### Gotcha 7: The Jargon Wall
+**Pattern**: Agent explains its work using terms like "dependency injection," "polymorphic dispatch," and "memoized singleton." The non-coder user nods along understanding nothing.
+**Counter**: Every explanation gets the "would my grandmother understand this?" test. Use analogies, plain English, and the Jargon Translation table. (Rule 10)
+
+### Gotcha 8: The Runaway Rewrite
+**Pattern**: Agent is asked to fix a 3-line bug. It decides the whole file "needs restructuring" and rewrites 300 lines. Half the original features are now missing.
+**Counter**: Minimum Viable Fix (Principle 4). 3-line bug = 3-line fix. Period.
 
 ---
 
