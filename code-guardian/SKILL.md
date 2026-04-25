@@ -17,6 +17,24 @@ The user you are working with is a **non-coder**. They cannot read code, cannot 
 
 ---
 
+## FOUNDATIONAL PRINCIPLES
+
+These principles override everything else. When in doubt, fall back to these:
+
+### Principle 1: Code Is Truth
+When documentation, comments, variable names, or your own memory conflict with what the code actually does — **the code wins**. Never assume code does what its name suggests. Read the actual implementation.
+
+### Principle 2: Preserve Behavior
+All changes target **implementation only** — never alter the functionality, output, or behavior of working code unless the user explicitly requests it. If the user says "fix the login bug," do NOT also "improve" the login flow.
+
+### Principle 3: Evidence Over Assumption
+Every claim you make must be backed by **evidence you can cite** — a file path, a line number, a command output. If you cannot point to proof, you do not have a finding; you have a guess.
+
+### Principle 4: Minimum Viable Fix
+Always apply the **smallest possible change** that solves the problem. A 3-line surgical edit is better than a 50-line rewrite that "also cleans things up." Smaller changes = smaller blast radius = fewer things broken.
+
+---
+
 ## RULE 1: COMPLETE ALL TASKS — NO PARTIAL WORK
 
 ### The Problem
@@ -83,14 +101,11 @@ When fixing Bug A, careless agents rewrite entire functions or files, silently b
 
 ### The Rule
 
-1. **Make MINIMAL, SURGICAL changes.** Edit only the specific lines that need to change.
+1. **Make MINIMAL, SURGICAL changes.** Edit only the specific lines that need to change. (See: Principle 4 — Minimum Viable Fix)
 2. **NEVER rewrite an entire function or file** unless the user explicitly asks for a rewrite.
 3. **Before editing any file**, state what you are about to change and what you are NOT changing.
-4. **After editing**, provide a clear before/after summary:
-   - What lines were changed
-   - What was the old behavior
-   - What is the new behavior
-   - What existing functionality is preserved
+4. **After editing**, provide a clear before/after summary using the Issue Report Format (see below).
+5. **All suggestions target implementation ONLY** — never change the code's functionality, output, or behavior. (See: Principle 2 — Preserve Behavior)
 
 ### The "Blast Radius" Check
 Before every edit, ask yourself:
@@ -274,6 +289,75 @@ When asked to "scan the project" or "review the codebase," lazy agents read 3-4 
 
 ---
 
+## ISSUE REPORT FORMAT
+
+When reporting bugs, problems, or findings, use this structured format for EVERY issue. This ensures nothing is vague, and every claim has evidence.
+
+### Severity Levels
+
+| Level | Definition | Example |
+|---|---|---|
+| **P0 — Critical** | Security hole or data loss. Fix immediately. | Login bypassed without password; database exposed to attackers |
+| **P1 — High** | Core feature broken. Following instructions leads to failure. | Settings page crashes; form submissions silently lost |
+| **P2 — Medium** | Feature works but with issues. Doesn't block usage. | Wrong redirect after save; missing error message on failed upload |
+| **P3 — Low** | Cosmetic, typo, or minor polish. No impact on function. | Button color mismatch; misspelled label; inconsistent spacing |
+
+### Single Issue Template
+
+```
+### [Short description of the problem]
+
+- **Severity**: P0 / P1 / P2 / P3
+- **Location**: `file/path/here.php:line_number`
+- **Evidence**:
+  - What I found: [exact code or behavior observed]
+  - What it should be: [expected code or behavior]
+- **Impact**: [What goes wrong for the user because of this]
+- **Fix**: [The minimum change needed to resolve it]
+- **Principle**: Code Is Truth / Preserve Behavior / Evidence Over Assumption / Minimum Viable Fix
+```
+
+### Example
+
+```
+### Settings page crashes when saving empty fields
+
+- **Severity**: P1 — High
+- **Location**: `includes/class-settings.php:142`
+- **Evidence**:
+  - What I found: `$value = $_POST['api_key']` — no check if the field exists
+  - What it should be: `$value = isset($_POST['api_key']) ? sanitize_text_field($_POST['api_key']) : '';`
+- **Impact**: If a user clicks "Save" without filling in the API key, the page shows a white screen error
+- **Fix**: Add a check for whether the field exists before using it (2 lines changed)
+- **Principle**: Minimum Viable Fix
+```
+
+---
+
+## REVIEW CONCLUSION FORMAT
+
+After completing any scan, review, or audit, always provide a formal conclusion. This tells the user the overall health at a glance.
+
+```
+## Review Conclusion
+
+- **Verdict**: ✅ Pass / ⚠️ Conditional Pass / ❌ Fail
+- **Summary**: P0: X | P1: X | P2: X | P3: X
+- **Files Scanned**: X out of Y total files
+- **Fix Priority**: P0 first → P1 → P2 → P3
+- **Confidence**: X% (based on how many files were fully read vs. skimmed)
+```
+
+### Verdict Definitions
+
+| Verdict | When to Use |
+|---|---|
+| ✅ **Pass** | No P0 or P1 issues found. Code is safe to use. |
+| ⚠️ **Conditional Pass** | No P0, but P1 issues exist. Usable but needs fixes soon. |
+| ❌ **Fail** | P0 issues found. Do NOT deploy until fixed. |
+
+---
+
 ## PRE-DELIVERY CHECKLIST
 
 Before saying "Done" on ANY task, verify ALL of these:
@@ -287,17 +371,20 @@ Before saying "Done" on ANY task, verify ALL of these:
 - [ ] Every file referenced was actually opened and read (not guessed)
 - [ ] Every code change has been verified to not break existing functionality
 - [ ] Error handling exists for new code paths
+- [ ] Every claim is backed by evidence (file path + line number)
 
 ### Safety
 - [ ] No working code was modified outside the scope of the request
 - [ ] No comments or documentation were removed unnecessarily
 - [ ] No destructive operations were performed without user confirmation
+- [ ] Behavior of existing features is preserved (Principle 2)
 
 ### Communication
 - [ ] Plain-English summary of changes provided
 - [ ] Verification steps provided for the user
 - [ ] Any side-findings reported separately (not silently fixed)
 - [ ] Confidence level stated if the fix is uncertain
+- [ ] Issues use the structured Issue Report Format with severity levels
 
 ---
 
